@@ -1,0 +1,55 @@
+
+services:
+  postgresql:
+    container_name: postgresql
+    image: postgres:18.4
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin12345
+      POSTGRES_db: car_sale_db
+      PGDATA: /data/postgres
+    volumes:
+      - postgres:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - webapi_network
+    restart: unless-stopped
+
+  pgadmin:
+    container_name: pgadmin
+    image: elestio/pgadmin:REL-9_15
+    environment:
+      PGADMIN_DEFAULT_EMAIL: hassan@example.com
+      PGADMIN_DEFAULT_PASSWORD: a12345
+    volumes:
+      - pg_admin:/var/lib/pgadmin  
+    ports:
+      - "8080:80"
+    networks:
+      - webapi_network
+    restart: unless-stopped
+    depends_on:
+      - postgresql
+
+  redis:
+    container_name: redis
+    image: redis:8.8.0
+    command: ["redis-server", "/etc/redis/redis.conf"]
+    volumes:
+      - ./redis/redis.conf:/etc/redis/redis.conf
+      - redis:/data
+      - redis:/etc/redis.conf
+
+    ports:
+      - "6379:6379"
+
+volumes:
+  postgres:
+  pg_admin:
+  logs:
+  redis:
+
+networks:
+  webapi_network:
+    driver: bridge
