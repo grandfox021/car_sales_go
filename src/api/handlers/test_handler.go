@@ -10,8 +10,9 @@ import (
 
 type Person struct{
 
-	Firstname  string
-	Phone 	  int
+	Firstname   string `json:"firstname" binding:"required,min=3,max=10"`
+	Email 		string `json:"email" binding:"required,email,min=5,max=20"`
+	Phone 	  	string `json:"phonenumber" binding:"required,numeric,iranphone,len=11"`
 
 }
 
@@ -124,7 +125,14 @@ func (h *TestHandler) Test_bodybinder(c *gin.Context) {
 
 	person := Person{}
 
-	c.ShouldBindJSON(&person)
+	err := c.ShouldBindJSON(&person)
+	 if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error" : err.Error(),
+		})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
 		"result": "Test_bodybinder !",
 		"success":true,
