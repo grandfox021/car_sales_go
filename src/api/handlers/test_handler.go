@@ -1,12 +1,11 @@
 package handlers
 
 import (
+	"car_sales_mod/src/api/helper"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
-
-
 
 type Person struct{
 
@@ -80,19 +79,10 @@ func (h *TestHandler) Test_headerbineder2(c *gin.Context) {
 
 	err := c.BindHeader(&header)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"result":  "Test_headerbineder2 !",
-			"success": false,
-			"error":   err.Error(),
-		})
+		c.JSON(http.StatusBadRequest, helper.GenerateBaseResponeWithError(nil,false,-1,err))
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"result":        "Test_headerbineder2 !",
-		"success":       true,
-		"binded_header": header,
-	})
+	c.JSON(http.StatusOK, helper.GenerateBaseRespone("TestBinder2 called !",true , 0))
 }
 
 func (h *TestHandler) Test_querybinder1(c *gin.Context) {
@@ -110,6 +100,7 @@ func (h *TestHandler) Test_querybinder1(c *gin.Context) {
 
 func (h *TestHandler) Test_querybinder2(c *gin.Context) {
 
+
 	ids := c.QueryArray("id")
 	name := c.Query("name")
 	c.JSON(http.StatusOK, gin.H{
@@ -126,20 +117,33 @@ func (h *TestHandler) Test_bodybinder(c *gin.Context) {
 	person := Person{}
 
 	err := c.ShouldBindJSON(&person)
-	 if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error" : err.Error(),
-		})
-		return
+
+	if err != nil {
+		c.AbortWithStatusJSON(403 , helper.GenerateBaseResponeWithValidationError(nil , false , -1, err))
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"result": "Test_bodybinder !",
-		"success":true,
-		"bodybinder": person,
+	c.JSON(http.StatusOK, helper.GenerateBaseRespone(
+		[2]any{"Test_bodybinder !",person},
+		true,
+		0,
+	))
+	}
 
-	})
-}
+
+	//  if err != nil {
+	// 	c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+	// 		"error" : err.Error(),
+	// 	})
+	// 	return
+	// }
+
+	// c.JSON(http.StatusOK, gin.H{
+	// 	"result": "Test_bodybinder !",
+	// 	"success":true,
+	// 	"bodybinder": person,
+
+	// })
+
 
 func (h *TestHandler) Test_formbinder(c *gin.Context) {
 

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"car_sales_mod/src/api/middlewares"
 	"car_sales_mod/src/api/routers"
 	"car_sales_mod/src/api/validations"
 	"car_sales_mod/src/config"
@@ -23,7 +24,7 @@ func Init_server(){
 		val.RegisterValidation("iranphone" , validations.IranianPhonenumberValidator,true)
 	}
 
-	r.Use(gin.Logger(),gin.Recovery())
+	r.Use(gin.Logger(),gin.Recovery(),middlewares.AuthSampleMiddleware())
 
 	api := r.Group("/api")
 	v1 := api.Group("/v1")
@@ -32,7 +33,6 @@ func Init_server(){
 	test := v1.Group("/test")
 	routers.Health(health)
 	routers.Testrouter(test)
-
 	
 	// r.Run("localhost:5005")
 	r.Run(fmt.Sprintf(":%s" , cfg.Server.Port))

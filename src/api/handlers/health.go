@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"fmt"
-
 	"github.com/gin-gonic/gin"
 )
 
